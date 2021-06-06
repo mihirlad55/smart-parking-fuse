@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "main.h"
+#include "uart.h"
 
 #include <mma8451.h>
 
@@ -57,7 +58,7 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
-static void MX_USART2_UART_Init(void);
+void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -102,14 +103,17 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  setbuf(stdout, NULL);
+
+
   mma8451_t mma;
   memset(&mma, 0, sizeof(mma8451_t));
 
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 
-  uint8_t msg1[] = "Beginning Default\n";
+  printf("Beginning default\n");
 
-  serial_write(msg1, sizeof(msg1));
   uint8_t res = mma8451_begin_default(&mma, &hi2c1);
 
   /* USER CODE END 2 */
@@ -118,7 +122,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    char data[100] = {0};
     //HAL_UART_Transmit(&huart2, data, sizeof(data), 100);
     /* USER CODE END WHILE */
 
@@ -128,9 +131,8 @@ int main(void)
     //HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, MMA8451_DEFAULT_ADDRESS, MMA8451_REG_WHOAMI, 1, &data_r, 1,
 //                     10000);
 
-    sprintf((char*) data, "Res: %d\n", (int)res);
+    printf("Res %d\n", (int)res);
     //sprintf((char*)data, "x_g: %f y_g: %f z_g: %f\n", mma.x_g, mma.y_g, mma.z_g);
-    serial_write((uint8_t *)data, strlen(data));
     HAL_Delay(100);
     /* USER CODE BEGIN 3 */
   }
@@ -232,39 +234,6 @@ static void MX_I2C1_Init(void)
   /* USER CODE END I2C1_Init 2 */
 
 }
-
-/**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 9600;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
 
 }
 

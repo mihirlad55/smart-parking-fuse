@@ -1,4 +1,5 @@
 #include <mma8451.h>
+#include <stdio.h>
 
 static void mma8451_write_register_8(const mma8451_t *mma, uint8_t reg,
                                      uint8_t value) {
@@ -19,6 +20,7 @@ uint8_t mma8451_begin(mma8451_t *mma, I2C_HandleTypeDef *hi2c, uint8_t addr) {
   mma->i2caddr = addr;
   mma->hi2c = hi2c;
 
+  printf("Trying to read register\n");
   /* Check connection */
   uint8_t deviceid = mma8451_read_register_8(mma, MMA8451_REG_WHOAMI);
   if (deviceid != 0x1A) {
